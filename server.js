@@ -35,6 +35,7 @@ const AUDIO_EXT = new Set([".mp3", ".m4a", ".opus", ".ogg", ".flac", ".wav", ".w
 
 const app = express();
 const PORT = 3000;
+const LIBRARY_DEFAULT_LIMIT = 2;
 
 function resolveDownloadsRoot(customDest) {
     const dest = (customDest || "").trim();
@@ -138,7 +139,16 @@ function listDirFiles(dirPath) {
         .sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
 }
 
-function listLibrary(root) {
+function parseLibraryLimit(query = {}) {
+    if (query.all === "1" || query.all === "true") return 0;
+    if (query.limit !== undefined) {
+        const n = parseInt(String(query.limit), 10);
+        if (Number.isFinite(n) && n >= 0) return n;
+    }
+    return LIBRARY_DEFAULT_LIMIT;
+}
+
+function listLibrary(root, limit = 0) {
     fs.mkdirSync(root, { recursive: true });
     const playlists = [];
     let totalBytes = 0;
@@ -184,9 +194,15 @@ function listLibrary(root) {
     }
 
     playlists.sort((a, b) => b.mtime - a.mtime);
+    const totalPlaylists = playlists.length;
+    const visible = limit > 0 ? playlists.slice(0, limit) : playlists;
+
     return {
         root,
-        playlists,
+        playlists: visible,
+        totalPlaylists,
+        limited: limit > 0 && totalPlaylists > visible.length,
+        limit: limit > 0 ? limit : null,
         storage: { root, totalBytes },
         resumes,
     };
@@ -329,8 +345,6 @@ app.use((req, res, next) => {
     }
     next();
 });
-
-app.use(express.static(path.join(__dirname, "public")));
 
 // Map de jobs: jobId -> { process, subscribers[], history[], ... }
 const jobs = new Map();
@@ -579,11 +593,12 @@ app.get("/progress/:jobId", (req, res) => {
     });
 });
 
-// GET /api/library — lista playlists e faixas
+// GET /api/library — playlists (padrão: 2 mais recentes; ?all=1 para listar todas)
 app.get("/api/library", (req, res) => {
     try {
         const root = resolveDownloadsRoot(req.query.dest);
-        res.json(listLibrary(root));
+        const limit = parseLibraryLimit(req.query);
+        res.json(listLibrary(root, limit));
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
@@ -644,7 +659,8 @@ app.post("/cancel/:jobId", (req, res) => {
     res.json({ ok: true });
 });
 
-// console.log();
+app.use(express.static(path.join(__dirname, "public")));
+
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`🎵 Music Downloader rodando em http://0.0.0.0:${PORT}`);
     try {

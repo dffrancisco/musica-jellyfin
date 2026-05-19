@@ -19,687 +19,9 @@
   <link
     href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;500&display=swap"
     rel="stylesheet" />
-  <style>
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
 
-    html {
-      touch-action: manipulation;
-      -webkit-text-size-adjust: 100%;
-      text-size-adjust: 100%;
-    }
+  <link rel="stylesheet" href="/style.css">
 
-    :root {
-      --bg: #0d0d0d;
-      --surface: #151515;
-      --border: #2a2a2a;
-      --accent: #c8f563;
-      --accent2: #5cf5c8;
-      --muted: #555;
-      --text: #e8e8e0;
-      --text-dim: #888;
-      --warn: #f5a623;
-      --err: #f56363;
-      --mono: 'IBM Plex Mono', monospace;
-      --sans: 'IBM Plex Sans', sans-serif;
-      --radius: 6px;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--sans);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 8px 20px 10px;
-    }
-
-    /* Header */
-    header {
-      width: 100%;
-      max-width: 720px;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: baseline;
-      gap: 14px;
-    }
-
-    .logo {
-      font-family: var(--mono);
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .2em;
-      text-transform: uppercase;
-      color: var(--accent);
-      border: 1px solid var(--accent);
-      padding: 4px 10px;
-      border-radius: 3px;
-    }
-
-    header h1 {
-      font-family: var(--mono);
-      font-size: 13px;
-      font-weight: 400;
-      color: var(--text-dim);
-      letter-spacing: .05em;
-    }
-
-    /* Card */
-    .card {
-      width: 100%;
-      max-width: 720px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-    }
-
-    /* Card title bar */
-    .card-bar {
-      background: var(--border);
-      padding: 10px 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .card-bar span {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--text-dim);
-      letter-spacing: .08em;
-    }
-
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--muted);
-    }
-
-    /* Form */
-    .form-body {
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    label {
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: .1em;
-      color: var(--accent);
-      display: block;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-    }
-
-    input[type="text"] {
-      width: 100%;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      color: var(--text);
-      font-family: var(--mono);
-      font-size: 16px;
-      padding: 12px 14px;
-      outline: none;
-      transition: border-color .2s;
-    }
-
-    input[type="text"]:focus {
-      border-color: var(--accent);
-    }
-
-    input[type="text"]::placeholder {
-      color: var(--muted);
-    }
-
-    .input-row {
-      display: flex;
-      gap: 8px;
-      align-items: stretch;
-    }
-
-    .input-row input[type="text"] {
-      flex: 1;
-      min-width: 0;
-    }
-
-    #btn-paste {
-      flex-shrink: 0;
-      background: var(--surface);
-      color: var(--accent);
-      border: 1px solid var(--border);
-      padding: 12px 14px;
-      text-transform: none;
-      letter-spacing: 0;
-    }
-
-    #btn-paste:disabled {
-      opacity: .35;
-      cursor: not-allowed;
-    }
-
-    .hint {
-      font-size: 11px;
-      color: var(--text-dim);
-      font-family: var(--mono);
-      margin-top: 6px;
-    }
-
-    /* Actions */
-    .actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 4px;
-    }
-
-    button {
-      font-family: var(--mono);
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      border: none;
-      border-radius: var(--radius);
-      cursor: pointer;
-      padding: 12px 24px;
-      transition: opacity .15s, transform .1s;
-    }
-
-    button:active {
-      transform: scale(.98);
-    }
-
-    #btn-download {
-      background: var(--accent);
-      color: #0d0d0d;
-      flex: 1;
-    }
-
-    #btn-download:disabled {
-      opacity: .35;
-      cursor: not-allowed;
-    }
-
-    #btn-cancel {
-      background: transparent;
-      color: var(--err);
-      border: 1px solid var(--err);
-      display: none;
-    }
-
-    #btn-cancel.visible {
-      display: block;
-    }
-
-    /* Status badge */
-    .status-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 0 28px 10px;
-      min-height: 32px;
-    }
-
-    .badge {
-      font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      padding: 3px 10px;
-      border-radius: 3px;
-      border: 1px solid currentColor;
-      display: none;
-    }
-
-    .badge.idle {
-      color: var(--muted);
-      display: inline;
-    }
-
-    .badge.running {
-      color: var(--accent2);
-      display: inline;
-    }
-
-    .badge.done {
-      color: var(--accent);
-      display: inline;
-    }
-
-    .badge.error {
-      color: var(--err);
-      display: inline;
-    }
-
-    .pulse {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--accent2);
-      display: none;
-      animation: blink 1s ease-in-out infinite;
-    }
-
-    .pulse.active {
-      display: block;
-    }
-
-    @keyframes blink {
-
-      0%,
-      100% {
-        opacity: 1
-      }
-
-      50% {
-        opacity: .2
-      }
-    }
-
-    /* Log terminal */
-    .log-wrap {
-      width: 100%;
-      max-width: 720px;
-      margin: 12px 0 12px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-    }
-
-    .log-header {
-      background: var(--border);
-      padding: 7px 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .log-header span {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--text-dim);
-      letter-spacing: .1em;
-    }
-
-    #btn-clear {
-      background: none;
-      border: none;
-      color: var(--muted);
-      font-family: var(--mono);
-      font-size: 10px;
-      padding: 2px 6px;
-      cursor: pointer;
-      letter-spacing: .08em;
-    }
-
-    #btn-clear:hover {
-      color: var(--text-dim);
-    }
-
-    #log {
-      background: var(--bg);
-      padding: 14px;
-      height: 320px;
-      overflow-y: auto;
-      font-family: var(--mono);
-      font-size: 11.5px;
-      line-height: 1.7;
-      scroll-behavior: smooth;
-    }
-
-    #log::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    #log::-webkit-scrollbar-thumb {
-      background: var(--border);
-      border-radius: 2px;
-    }
-
-    .log-line {
-      white-space: pre-wrap;
-      word-break: break-all;
-    }
-
-    .log-line.stderr {
-      color: var(--warn);
-    }
-
-    .log-line.info {
-      color: var(--accent2);
-    }
-
-    .log-line.success {
-      color: var(--accent);
-    }
-
-    .log-line.err-line {
-      color: var(--err);
-    }
-
-    .log-line.dim {
-      color: var(--text-dim);
-    }
-
-    /* Progress bar (parseia % do output do yt-dlp) */
-    .progress-wrap {
-      margin: 0 28px 20px;
-      display: none;
-    }
-
-    .progress-wrap.visible {
-      display: block;
-    }
-
-    .progress-track {
-      height: 3px;
-      background: var(--border);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: var(--accent);
-      width: 0%;
-      transition: width .3s;
-      border-radius: 2px;
-    }
-
-    .progress-label {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--text-dim);
-      margin-top: 6px;
-    }
-
-    .rename-panel {
-      width: 100%;
-      max-width: 720px;
-      margin-top: 12px;
-      padding: 14px;
-      background: var(--surface);
-      border: 1px solid var(--accent);
-      border-radius: var(--radius);
-      display: none;
-    }
-
-    .rename-panel.visible {
-      display: block;
-    }
-
-    .rename-panel label {
-      margin-bottom: 6px;
-    }
-
-    .rename-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 8px;
-    }
-
-    .rename-row input {
-      flex: 1;
-    }
-
-    #btn-rename-save {
-      background: var(--accent2);
-      color: #0d0d0d;
-      flex-shrink: 0;
-      text-transform: none;
-      letter-spacing: 0;
-    }
-
-    .library-card {
-      width: 100%;
-      max-width: 720px;
-      margin-top: 12px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-    }
-
-    .library-body {
-      padding: 0 14px 14px;
-      max-height: 420px;
-      overflow-y: auto;
-    }
-
-    .library-empty {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--text-dim);
-      padding: 16px 0;
-    }
-
-    .playlist-item {
-      border-bottom: 1px solid var(--border);
-      padding: 12px 0;
-    }
-
-    .playlist-item:last-child {
-      border-bottom: none;
-    }
-
-    .playlist-head {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-
-    .playlist-name {
-      font-family: var(--mono);
-      font-size: 12px;
-      color: var(--accent);
-      flex: 1;
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .playlist-rename-btn {
-      background: none;
-      border: 1px solid var(--border);
-      color: var(--text-dim);
-      padding: 4px 8px;
-      font-size: 10px;
-      text-transform: none;
-      letter-spacing: 0;
-    }
-
-    .track-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .track-btn {
-      width: 100%;
-      text-align: left;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 10px 12px;
-      font-family: var(--mono);
-      font-size: 11px;
-      text-transform: none;
-      letter-spacing: 0;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .track-btn:hover {
-      border-color: var(--accent);
-    }
-
-    .track-btn.playing {
-      border-color: var(--accent2);
-      color: var(--accent2);
-    }
-
-    .track-btn .play-icon {
-      color: var(--accent);
-      flex-shrink: 0;
-    }
-
-    .player-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      padding: 10px 16px;
-      display: none;
-      flex-direction: column;
-      gap: 6px;
-      z-index: 100;
-    }
-
-    .player-bar.visible {
-      display: flex;
-    }
-
-    .player-title {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--accent);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .player-bar audio {
-      width: 100%;
-      height: 36px;
-    }
-
-    body.has-player {
-      padding-bottom: 90px;
-    }
-
-    .storage-summary {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--text-dim);
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--border);
-      line-height: 1.6;
-      word-break: break-all;
-    }
-
-    .storage-summary strong {
-      color: var(--accent2);
-    }
-
-    .resume-panel {
-      width: 100%;
-      max-width: 720px;
-      margin-top: 12px;
-      padding: 14px;
-      background: var(--surface);
-      border: 1px solid var(--warn);
-      border-radius: var(--radius);
-      display: none;
-    }
-
-    .resume-panel.visible {
-      display: block;
-    }
-
-    .resume-item {
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid var(--border);
-    }
-
-    .resume-item:first-of-type {
-      margin-top: 8px;
-      padding-top: 0;
-      border-top: none;
-    }
-
-    .resume-link {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--text-dim);
-      word-break: break-all;
-      margin: 6px 0;
-    }
-
-    #btn-resume-last {
-      background: var(--warn);
-      color: #0d0d0d;
-      width: 100%;
-      margin-top: 8px;
-      text-transform: none;
-      letter-spacing: 0;
-    }
-
-    .btn-resume-sm {
-      background: transparent;
-      border: 1px solid var(--warn);
-      color: var(--warn);
-      padding: 4px 8px;
-      font-size: 10px;
-      text-transform: none;
-      letter-spacing: 0;
-      flex-shrink: 0;
-    }
-
-    .playlist-files {
-      margin-top: 8px;
-    }
-
-    .playlist-files summary {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--text-dim);
-      cursor: pointer;
-      list-style: none;
-    }
-
-    .playlist-files summary::-webkit-details-marker {
-      display: none;
-    }
-
-    .file-list {
-      list-style: none;
-      margin-top: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .file-list li {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--muted);
-      word-break: break-all;
-      line-height: 1.5;
-    }
-
-    .file-list li.is-audio {
-      color: var(--accent2);
-    }
-  </style>
 </head>
 
 <body>
@@ -832,6 +154,7 @@
     let playingTrackKey = null;
     let currentPlaylistDir = null;
     let libraryRefreshTimer = null;
+    let libraryShowAll = false;
 
     function getDestino() {
       return inputDest?.value.trim() ?? '';
@@ -891,6 +214,7 @@
     async function tryReconnectActiveJob() {
       try {
         const activeRes = await fetch('/api/jobs/active');
+        if (!activeRes.ok) return;
         const active = await activeRes.json();
         if (active.active) {
           attachToJob(active.jobId, active.link, false);
@@ -962,8 +286,11 @@
 
     async function loadLibrary() {
       try {
+        const params = new URLSearchParams();
         const dest = getDestino();
-        const q = dest ? `?dest=${encodeURIComponent(dest)}` : '';
+        if (dest) params.set('dest', dest);
+        if (libraryShowAll) params.set('all', '1');
+        const q = params.toString() ? `?${params}` : '';
         const res = await fetch(`/api/library${q}`);
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'erro ao listar');
@@ -992,6 +319,9 @@
 
     function renderLibrary(data) {
       const storage = data.storage || {};
+      const playlists = data.playlists || [];
+      const hiddenCount = (data.totalPlaylists ?? playlists.length) - playlists.length;
+
       let html = `
         <div class="storage-summary">
           <strong>Armazenamento:</strong> ${formatSize(storage.totalBytes || 0)}<br>
@@ -999,12 +329,17 @@
         </div>
       `;
 
-      if (!data.playlists?.length) {
+      if (!data.totalPlaylists && !playlists.length) {
         libraryList.innerHTML = html + '<p class="library-empty">Nenhuma música baixada ainda.</p>';
         return;
       }
 
-      html += data.playlists.map((pl) => `
+      if (!playlists.length) {
+        libraryList.innerHTML = html + '<p class="library-empty">Nenhuma playlist recente.</p>';
+        return;
+      }
+
+      html += playlists.map((pl) => `
         <article class="playlist-item" data-playlist="${encodeURIComponent(pl.name)}">
           <div class="playlist-head">
             <span class="playlist-name" title="${esc(pl.name)}">${esc(pl.name)}</span>
@@ -1036,12 +371,26 @@
         </article>
       `).join('');
 
+      if (data.limited || hiddenCount > 0) {
+        html += libraryShowAll
+          ? `<button type="button" class="library-toggle" id="btn-library-toggle">Mostrar só as mais recentes</button>`
+          : `<button type="button" class="library-toggle" id="btn-library-toggle">Ver todas (${hiddenCount} oculta${hiddenCount === 1 ? '' : 's'})</button>`;
+      }
+
       libraryList.innerHTML = html;
+
+      const btnToggle = document.getElementById('btn-library-toggle');
+      if (btnToggle) {
+        btnToggle.addEventListener('click', () => {
+          libraryShowAll = !libraryShowAll;
+          loadLibrary();
+        });
+      }
 
       libraryList.querySelectorAll('.btn-resume-pl').forEach((btn) => {
         const article = btn.closest('.playlist-item');
         const name = decodeURIComponent(article.dataset.playlist);
-        const pl = data.playlists.find((p) => p.name === name);
+        const pl = playlists.find((p) => p.name === name);
         if (pl?.resume) btn.addEventListener('click', () => resumeDownload(pl.resume.link));
       });
 
