@@ -1,0 +1,20 @@
+# Imagem pronta do Docker Hub — sem build local
+# cd ~/yt-dlp && export DOCKER_CONFIG=$HOME/.docker && docker compose up -d
+
+services:
+  music-downloader:
+    image: node:22-bookworm-slim
+    container_name: zima-dlp-ytb
+    user: "0:0"
+    working_dir: /app
+    entrypoint: ["/bin/sh", "/app/entrypoint.sh"]
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - ./downloads:/app/downloads
+    environment:
+      NODE_ENV: production
+      YTDLP_DISABLE_COOKIES: "1"
+      YTDLP_BIN: /usr/local/bin/yt-dlp
+    restart: unless-stopped

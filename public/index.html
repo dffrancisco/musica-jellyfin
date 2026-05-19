@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="description" content="Downloader de música via yt-dlp para Zima OS" />
+  <meta name="theme-color" content="#0d0d0d" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="YT-DLP" />
+  <title>Music Downloader</title>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" href="/icon.png" type="image/png" />
+  <link rel="apple-touch-icon" href="/icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;500&display=swap"
+    rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      touch-action: manipulation;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    :root {
+      --bg: #0d0d0d;
+      --surface: #151515;
+      --border: #2a2a2a;
+      --accent: #c8f563;
+      --accent2: #5cf5c8;
+      --muted: #555;
+      --text: #e8e8e0;
+      --text-dim: #888;
+      --warn: #f5a623;
+      --err: #f56363;
+      --mono: 'IBM Plex Mono', monospace;
+      --sans: 'IBM Plex Sans', sans-serif;
+      --radius: 6px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 20px 10px;
+    }
+
+    /* Header */
+    header {
+      width: 100%;
+      max-width: 720px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+    }
+
+    .logo {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 4px 10px;
+      border-radius: 3px;
+    }
+
+    header h1 {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-dim);
+      letter-spacing: .05em;
+    }
+
+    /* Card */
+    .card {
+      width: 100%;
+      max-width: 720px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    /* Card title bar */
+    .card-bar {
+      background: var(--border);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-bar span {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: .08em;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--muted);
+    }
+
+    /* Form */
+    .form-body {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    label {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .1em;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 16px;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color .2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--accent);
+    }
+
+    input[type="text"]::placeholder {
+      color: var(--muted);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    .input-row input[type="text"] {
+      flex: 1;
+      min-width: 0;
+    }
+
+    #btn-paste {
+      flex-shrink: 0;
+      background: var(--surface);
+      color: var(--accent);
+      border: 1px solid var(--border);
+      padding: 12px 14px;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    #btn-paste:disabled {
+      opacity: .35;
+      cursor: not-allowed;
+    }
+
+    .hint {
+      font-size: 11px;
+      color: var(--text-dim);
+      font-family: var(--mono);
+      margin-top: 6px;
+    }
+
+    /* Actions */
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    button {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      padding: 12px 24px;
+      transition: opacity .15s, transform .1s;
+    }
+
+    button:active {
+      transform: scale(.98);
+    }
+
+    #btn-download {
+      background: var(--accent);
+      color: #0d0d0d;
+      flex: 1;
+    }
+
+    #btn-download:disabled {
+      opacity: .35;
+      cursor: not-allowed;
+    }
+
+    #btn-cancel {
+      background: transparent;
+      color: var(--err);
+      border: 1px solid var(--err);
+      display: none;
+    }
+
+    #btn-cancel.visible {
+      display: block;
+    }
+
+    /* Status badge */
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 28px 10px;
+      min-height: 32px;
+    }
+
+    .badge {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 3px;
+      border: 1px solid currentColor;
+      display: none;
+    }
+
+    .badge.idle {
+      color: var(--muted);
+      display: inline;
+    }
+
+    .badge.running {
+      color: var(--accent2);
+      display: inline;
+    }
+
+    .badge.done {
+      color: var(--accent);
+      display: inline;
+    }
+
+    .badge.error {
+      color: var(--err);
+      display: inline;
+    }
+
+    .pulse {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent2);
+      display: none;
+      animation: blink 1s ease-in-out infinite;
+    }
+
+    .pulse.active {
+      display: block;
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .2
+      }
+    }
+
+    /* Log terminal */
+    .log-wrap {
+      width: 100%;
+      max-width: 720px;
+      margin: 12px 0 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .log-header {
+      background: var(--border);
+      padding: 7px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .log-header span {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: .1em;
+    }
+
+    #btn-clear {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 2px 6px;
+      cursor: pointer;
+      letter-spacing: .08em;
+    }
+
+    #btn-clear:hover {
+      color: var(--text-dim);
+    }
+
+    #log {
+      background: var(--bg);
+      padding: 14px;
+      height: 320px;
+      overflow-y: auto;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      line-height: 1.7;
+      scroll-behavior: smooth;
+    }
+
+    #log::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    #log::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    .log-line {
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .log-line.stderr {
+      color: var(--warn);
+    }
+
+    .log-line.info {
+      color: var(--accent2);
+    }
+
+    .log-line.success {
+      color: var(--accent);
+    }
+
+    .log-line.err-line {
+      color: var(--err);
+    }
+
+    .log-line.dim {
+      color: var(--text-dim);
+    }
+
+    /* Progress bar (parseia % do output do yt-dlp) */
+    .progress-wrap {
+      margin: 0 28px 20px;
+      display: none;
+    }
+
+    .progress-wrap.visible {
+      display: block;
+    }
+
+    .progress-track {
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width .3s;
+      border-radius: 2px;
+    }
+
+    .progress-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      margin-top: 6px;
+    }
+
+    .rename-panel {
+      width: 100%;
+      max-width: 720px;
+      margin-top: 12px;
+      padding: 14px;
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      display: none;
+    }
+
+    .rename-panel.visible {
+      display: block;
+    }
+
+    .rename-panel label {
+      margin-bottom: 6px;
+    }
+
+    .rename-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .rename-row input {
+      flex: 1;
+    }
+
+    #btn-rename-save {
+      background: var(--accent2);
+      color: #0d0d0d;
+      flex-shrink: 0;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    .library-card {
+      width: 100%;
+      max-width: 720px;
+      margin-top: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .library-body {
+      padding: 0 14px 14px;
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    .library-empty {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      padding: 16px 0;
+    }
+
+    .playlist-item {
+      border-bottom: 1px solid var(--border);
+      padding: 12px 0;
+    }
+
+    .playlist-item:last-child {
+      border-bottom: none;
+    }
+
+    .playlist-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .playlist-name {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent);
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .playlist-rename-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 4px 8px;
+      font-size: 10px;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    .track-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .track-btn {
+      width: 100%;
+      text-align: left;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 12px;
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: none;
+      letter-spacing: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .track-btn:hover {
+      border-color: var(--accent);
+    }
+
+    .track-btn.playing {
+      border-color: var(--accent2);
+      color: var(--accent2);
+    }
+
+    .track-btn .play-icon {
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .player-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 10px 16px;
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 100;
+    }
+
+    .player-bar.visible {
+      display: flex;
+    }
+
+    .player-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .player-bar audio {
+      width: 100%;
+      height: 36px;
+    }
+
+    body.has-player {
+      padding-bottom: 90px;
+    }
+
+    .storage-summary {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      line-height: 1.6;
+      word-break: break-all;
+    }
+
+    .storage-summary strong {
+      color: var(--accent2);
+    }
+
+    .resume-panel {
+      width: 100%;
+      max-width: 720px;
+      margin-top: 12px;
+      padding: 14px;
+      background: var(--surface);
+      border: 1px solid var(--warn);
+      border-radius: var(--radius);
+      display: none;
+    }
+
+    .resume-panel.visible {
+      display: block;
+    }
+
+    .resume-item {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    .resume-item:first-of-type {
+      margin-top: 8px;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .resume-link {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      word-break: break-all;
+      margin: 6px 0;
+    }
+
+    #btn-resume-last {
+      background: var(--warn);
+      color: #0d0d0d;
+      width: 100%;
+      margin-top: 8px;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    .btn-resume-sm {
+      background: transparent;
+      border: 1px solid var(--warn);
+      color: var(--warn);
+      padding: 4px 8px;
+      font-size: 10px;
+      text-transform: none;
+      letter-spacing: 0;
+      flex-shrink: 0;
+    }
+
+    .playlist-files {
+      margin-top: 8px;
+    }
+
+    .playlist-files summary {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .playlist-files summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .file-list {
+      list-style: none;
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .file-list li {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      word-break: break-all;
+      line-height: 1.5;
+    }
+
+    .file-list li.is-audio {
+      color: var(--accent2);
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo">YT-DLP</div>
+    <h1>Music Downloader · Zima OS</h1>
+  </header>
+
+  <div class="card">
+    <div class="card-bar">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <span>Novo Download</span>
+    </div>
+
+    <div class="form-body">
+      <div>
+        <label for="input-link">URL da playlist ou música</label>
+        <div class="input-row">
+          <input type="text" id="input-link"
+            placeholder="https://open.spotify.com/playlist/... ou youtube.com/watch?v=..." />
+          <button type="button" id="btn-paste">📋</button>
+        </div>
+        <p class="hint">YouTube</p>
+      </div>
+
+      <!-- <div>
+        <label for="input-dest">Pasta de destino (no servidor)</label>
+        <input type="text" id="input-dest" placeholder="/mnt/media/musicas  (padrão: ./downloads)" />
+      </div> -->
+
+      <div class="actions">
+        <button id="btn-download">▶ Iniciar download</button>
+        <button id="btn-cancel">✕ Cancelar</button>
+      </div>
+    </div>
+
+    <div class="status-row">
+      <div class="pulse" id="pulse"></div>
+      <span class="badge idle" id="badge">idle</span>
+      <span id="status-msg" style="font-family:var(--mono);font-size:11px;color:var(--text-dim)"></span>
+    </div>
+
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <div class="progress-label" id="progress-label"></div>
+    </div>
+
+  </div>
+
+  <div class="log-wrap">
+    <div class="log-header">
+      <span>stdout / stderr</span>
+      <button id="btn-clear">limpar</button>
+    </div>
+    <div id="log"></div>
+  </div>
+
+  <div class="rename-panel" id="rename-panel">
+    <label for="input-rename">Renomear pasta da playlist</label>
+    <p class="hint">Ajuste o nome da pasta no servidor após o download.</p>
+    <div class="rename-row">
+      <input type="text" id="input-rename" />
+      <button type="button" id="btn-rename-save">Salvar</button>
+    </div>
+  </div>
+
+
+  <div class="resume-panel" id="resume-panel">
+    <label>Continuar download</label>
+    <p class="hint">O yt-dlp pula faixas já registradas no arquivo de archive e baixa só o que falta.</p>
+    <div id="resume-items"></div>
+    <button type="button" id="btn-resume-last" style="display:none">↻ Continuar último link</button>
+  </div>
+
+  <div class="library-card">
+    <div class="card-bar">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <span>Biblioteca</span>
+      <button type="button" id="btn-refresh-lib"
+        style="margin-left:auto;background:none;border:1px solid var(--border);color:var(--text-dim);padding:4px 10px;font-size:10px;text-transform:none;letter-spacing:0;">↻</button>
+    </div>
+    <div class="library-body" id="library-list">
+      <p class="library-empty">Carregando...</p>
+    </div>
+  </div>
+
+  <div class="player-bar" id="player-bar">
+    <div class="player-title" id="player-title">—</div>
+    <audio id="audio-player" controls preload="metadata"></audio>
+  </div>
+
+  <script>
+    const btnDownload = document.getElementById('btn-download');
+    const btnCancel = document.getElementById('btn-cancel');
+    const btnClear = document.getElementById('btn-clear');
+    const btnPaste = document.getElementById('btn-paste');
+    const inputLink = document.getElementById('input-link');
+    const inputDest = document.getElementById('input-dest');
+    const log = document.getElementById('log');
+    const badge = document.getElementById('badge');
+    const pulse = document.getElementById('pulse');
+    const statusMsg = document.getElementById('status-msg');
+    const progressWrap = document.getElementById('progress-wrap');
+    const progressFill = document.getElementById('progress-fill');
+    const progressLabel = document.getElementById('progress-label');
+    const renamePanel = document.getElementById('rename-panel');
+    const inputRename = document.getElementById('input-rename');
+    const btnRenameSave = document.getElementById('btn-rename-save');
+    const libraryList = document.getElementById('library-list');
+    const btnRefreshLib = document.getElementById('btn-refresh-lib');
+    const resumePanel = document.getElementById('resume-panel');
+    const resumeItems = document.getElementById('resume-items');
+    const btnResumeLast = document.getElementById('btn-resume-last');
+    const LS_RESUME = 'zima-last-download';
+    const LS_ACTIVE_JOB = 'zima-active-job';
+    const playerBar = document.getElementById('player-bar');
+    const playerTitle = document.getElementById('player-title');
+    const audioPlayer = document.getElementById('audio-player');
+
+    let currentJobId = null;
+    let evtSource = null;
+    let renameOldName = null;
+    let playingTrackKey = null;
+    let currentPlaylistDir = null;
+    let libraryRefreshTimer = null;
+
+    function getDestino() {
+      return inputDest?.value.trim() ?? '';
+    }
+
+    function audioUrl(playlist, file) {
+      const dest = getDestino();
+      const q = dest ? `?dest=${encodeURIComponent(dest)}` : '';
+      return `/api/audio/${encodeURIComponent(playlist)}/${encodeURIComponent(file)}${q}`;
+    }
+
+    function formatSize(bytes) {
+      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+      return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    }
+
+    function esc(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function saveLastDownload(link, playlistDir) {
+      localStorage.setItem(LS_RESUME, JSON.stringify({ link, playlistDir, at: Date.now() }));
+    }
+
+    function clearLastDownload() {
+      localStorage.removeItem(LS_RESUME);
+    }
+
+    function saveActiveJob(jobId, link) {
+      localStorage.setItem(LS_ACTIVE_JOB, JSON.stringify({ jobId, link }));
+    }
+
+    function clearActiveJob() {
+      localStorage.removeItem(LS_ACTIVE_JOB);
+    }
+
+    function attachToJob(jobId, link, finished = false) {
+      if (link) inputLink.value = link;
+      currentJobId = jobId;
+
+      if (!finished) {
+        btnDownload.disabled = true;
+        btnCancel.classList.add('visible');
+        setStatus('running', 'download em andamento');
+        addLog('→ log reconectado — o download segue no servidor', 'info');
+      } else {
+        setStatus('running', 'recuperando log...');
+        addLog('→ recuperando histórico do download...', 'info');
+      }
+
+      connectSSE(jobId);
+    }
+
+    async function tryReconnectActiveJob() {
+      try {
+        const activeRes = await fetch('/api/jobs/active');
+        const active = await activeRes.json();
+        if (active.active) {
+          attachToJob(active.jobId, active.link, false);
+          return;
+        }
+
+        const saved = JSON.parse(localStorage.getItem(LS_ACTIVE_JOB) || 'null');
+        if (!saved?.jobId) return;
+
+        const st = await fetch(`/api/jobs/${saved.jobId}`).then((r) => r.json());
+        if (!st.exists) {
+          clearActiveJob();
+          return;
+        }
+
+        attachToJob(saved.jobId, saved.link || st.link, st.done);
+      } catch {
+        /* servidor indisponível */
+      }
+    }
+
+    function resumeDownload(link) {
+      if (!link) return;
+      inputLink.value = link;
+      inputLink.focus();
+      startDownload();
+    }
+
+    function renderResumePanel(resumes) {
+      const list = resumes?.length ? resumes : [];
+      const last = JSON.parse(localStorage.getItem(LS_RESUME) || 'null');
+
+      if (!list.length && !last?.link) {
+        resumePanel.classList.remove('visible');
+        btnResumeLast.style.display = 'none';
+        return;
+      }
+
+      resumePanel.classList.add('visible');
+
+      resumeItems.innerHTML = list.map((r) => `
+        <div class="resume-item">
+          <div class="hint">${r.playlistDir ? esc(r.playlistDir) : 'Playlist'} · ${r.archivedCount} já no archive · ${r.status}</div>
+          <div class="resume-link">${esc(r.link)}</div>
+          <button type="button" class="btn-resume-sm" data-link="${esc(r.link)}">↻ Continuar</button>
+        </div>
+      `).join('');
+
+      resumeItems.querySelectorAll('.btn-resume-sm').forEach((btn, i) => {
+        btn.addEventListener('click', () => resumeDownload(list[i].link));
+      });
+
+      const primary = list[0]?.link || last?.link;
+      if (primary) {
+        btnResumeLast.style.display = 'block';
+        btnResumeLast.onclick = () => resumeDownload(primary);
+      } else {
+        btnResumeLast.style.display = 'none';
+      }
+    }
+
+    function scheduleLibraryRefresh() {
+      if (libraryRefreshTimer) clearTimeout(libraryRefreshTimer);
+      libraryRefreshTimer = setTimeout(() => {
+        libraryRefreshTimer = null;
+        loadLibrary();
+      }, 400);
+    }
+
+    async function loadLibrary() {
+      try {
+        const dest = getDestino();
+        const q = dest ? `?dest=${encodeURIComponent(dest)}` : '';
+        const res = await fetch(`/api/library${q}`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'erro ao listar');
+        renderResumePanel(data.resumes);
+        renderLibrary(data);
+      } catch (e) {
+        libraryList.innerHTML = `<p class="library-empty">✗ ${e.message}</p>`;
+      }
+    }
+
+    function onJobFinished(message, playlistDir, partial = false, resumeLink = null) {
+      progressFill.style.width = '100%';
+      addLog(`${partial ? '⚠' : '✓'} ${message}`, partial ? 'stderr' : 'success');
+      setStatus('done', message);
+      reset();
+      if (resumeLink) {
+        saveLastDownload(resumeLink, playlistDir || currentPlaylistDir);
+        addLog('→ use "Continuar download" para retomar do archive', 'info');
+      } else {
+        clearLastDownload();
+      }
+      loadLibrary();
+      const dir = playlistDir || currentPlaylistDir;
+      if (dir) showRenamePanel(dir);
+    }
+
+    function renderLibrary(data) {
+      const storage = data.storage || {};
+      let html = `
+        <div class="storage-summary">
+          <strong>Armazenamento:</strong> ${formatSize(storage.totalBytes || 0)}<br>
+          <strong>Pasta:</strong> ${esc(storage.root || data.root || '—')}
+        </div>
+      `;
+
+      if (!data.playlists?.length) {
+        libraryList.innerHTML = html + '<p class="library-empty">Nenhuma música baixada ainda.</p>';
+        return;
+      }
+
+      html += data.playlists.map((pl) => `
+        <article class="playlist-item" data-playlist="${encodeURIComponent(pl.name)}">
+          <div class="playlist-head">
+            <span class="playlist-name" title="${esc(pl.name)}">${esc(pl.name)}</span>
+            <span class="hint">${formatSize(pl.totalSize)} · ${pl.tracks.length} faixa(s)</span>
+            ${pl.resume ? '<button type="button" class="btn-resume-sm btn-resume-pl">↻</button>' : ''}
+            <button type="button" class="playlist-rename-btn" data-rename="${encodeURIComponent(pl.name)}">✎</button>
+          </div>
+          <details class="playlist-files">
+            <summary>📁 ${esc(pl.path)}</summary>
+            <ul class="file-list">
+              ${(pl.files || []).map((f) => `
+                <li class="${f.isAudio ? 'is-audio' : ''}">${esc(f.name)} · ${formatSize(f.size)}</li>
+              `).join('')}
+            </ul>
+          </details>
+          <ul class="track-list">
+            ${pl.tracks.map((t) => {
+        const key = `${pl.name}::${t.file}`;
+        const playing = playingTrackKey === key ? ' playing' : '';
+        return `<li>
+                <button type="button" class="track-btn${playing}" data-playlist="${encodeURIComponent(pl.name)}" data-file="${encodeURIComponent(t.file)}" data-title="${t.name}">
+                  <span class="play-icon">▶</span>
+                  <span>${t.name}</span>
+                  <span class="hint" style="margin-left:auto">${formatSize(t.size)}</span>
+                </button>
+              </li>`;
+      }).join('')}
+          </ul>
+        </article>
+      `).join('');
+
+      libraryList.innerHTML = html;
+
+      libraryList.querySelectorAll('.btn-resume-pl').forEach((btn) => {
+        const article = btn.closest('.playlist-item');
+        const name = decodeURIComponent(article.dataset.playlist);
+        const pl = data.playlists.find((p) => p.name === name);
+        if (pl?.resume) btn.addEventListener('click', () => resumeDownload(pl.resume.link));
+      });
+
+      libraryList.querySelectorAll('.track-btn').forEach((btn) => {
+        btn.addEventListener('click', () => playTrack(
+          decodeURIComponent(btn.dataset.playlist),
+          decodeURIComponent(btn.dataset.file),
+          btn.dataset.title,
+        ));
+      });
+
+      libraryList.querySelectorAll('.playlist-rename-btn').forEach((btn) => {
+        btn.addEventListener('click', () => showRenamePanel(decodeURIComponent(btn.dataset.rename)));
+      });
+    }
+
+    function playTrack(playlist, file, title) {
+      playingTrackKey = `${playlist}::${file}`;
+      playerTitle.textContent = `${playlist} · ${title}`;
+      audioPlayer.src = audioUrl(playlist, file);
+      playerBar.classList.add('visible');
+      document.body.classList.add('has-player');
+      audioPlayer.play().catch(() => { });
+      loadLibrary();
+    }
+
+    function showRenamePanel(folderName) {
+      if (!folderName) return;
+      renameOldName = folderName;
+      inputRename.value = folderName;
+      renamePanel.classList.add('visible');
+      inputRename.focus();
+      inputRename.select();
+    }
+
+    function hideRenamePanel() {
+      renamePanel.classList.remove('visible');
+      renameOldName = null;
+    }
+
+    async function saveRename() {
+      const newName = inputRename.value.trim();
+      if (!renameOldName || !newName) return;
+      if (newName === renameOldName) {
+        hideRenamePanel();
+        return;
+      }
+
+      btnRenameSave.disabled = true;
+      try {
+        const res = await fetch('/api/library/rename', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            oldName: renameOldName,
+            newName,
+            destino: getDestino(),
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'falha ao renomear');
+
+        if (playingTrackKey?.startsWith(`${renameOldName}::`)) {
+          const file = playingTrackKey.split('::')[1];
+          playingTrackKey = `${newName}::${file}`;
+          const [pl, title] = playerTitle.textContent.split(' · ');
+          playerTitle.textContent = `${newName} · ${title || ''}`;
+          audioPlayer.src = audioUrl(newName, file);
+        }
+
+        hideRenamePanel();
+        setStatus('done', `pasta renomeada → ${data.name}`);
+        await loadLibrary();
+      } catch (e) {
+        setStatus('error', e.message);
+      } finally {
+        btnRenameSave.disabled = false;
+      }
+    }
+
+    function setStatus(state, msg = '') {
+      badge.className = `badge ${state}`;
+      badge.textContent = state;
+      pulse.className = `pulse ${state === 'running' ? 'active' : ''}`;
+      statusMsg.textContent = msg;
+    }
+
+    function addLog(line, cls = '') {
+      const div = document.createElement('div');
+      div.className = `log-line ${cls}`;
+      div.textContent = line;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    // Tenta extrair % de progresso do output do yt-dlp
+    function parseProgress(line) {
+      const m = line.match(/\[download\]\s+([\d.]+)%/);
+      if (m) {
+        const pct = parseFloat(m[1]);
+        progressFill.style.width = pct + '%';
+        progressLabel.textContent = line.replace('[download]', '').trim();
+        progressWrap.classList.add('visible');
+      }
+    }
+
+    function classifyLine(line, isStderr) {
+      if (isStderr) return 'stderr';
+      if (/\[download\]/.test(line)) return 'dim';
+      if (/\[ExtractAudio\]|\[ffmpeg\]|\[Metadata\]|\[EmbedThumbnail\]/.test(line)) return 'info';
+      if (/ERROR/.test(line)) return 'err-line';
+      return '';
+    }
+
+    async function pasteFromClipboard() {
+      if (!navigator.clipboard?.readText) {
+        setStatus('error', 'clipboard indisponível');
+        return;
+      }
+      btnPaste.disabled = true;
+      try {
+        const text = (await navigator.clipboard.readText()).trim();
+        if (!text) {
+          setStatus('idle', 'clipboard vazio');
+          return;
+        }
+        inputLink.value = text;
+        inputLink.focus();
+        setStatus('idle', 'colado');
+      } catch {
+        setStatus('error', 'permissão negada');
+      } finally {
+        btnPaste.disabled = false;
+      }
+    }
+
+    async function startDownload() {
+      const link = inputLink.value.trim();
+      const destino = inputDest?.value.trim() ?? '';
+
+      if (!link) { inputLink.focus(); return; }
+
+      // Reset UI
+      log.innerHTML = '';
+      currentPlaylistDir = null;
+      progressFill.style.width = '0%';
+      progressWrap.classList.remove('visible');
+      btnDownload.disabled = true;
+      btnCancel.classList.add('visible');
+      setStatus('running', 'iniciando...');
+      addLog('→ enviando requisição ao servidor...', 'info');
+
+      try {
+        const res = await fetch('/download', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ link, destino }),
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.jobId) {
+          addLog(`✗ Erro: ${data.error || 'resposta inesperada'}`, 'err-line');
+          setStatus('error');
+          reset();
+          return;
+        }
+
+        currentJobId = data.jobId;
+        saveActiveJob(data.jobId, link);
+        saveLastDownload(link, null);
+        if (data.resumed && data.archivedCount > 0) {
+          addLog(`→ retomando: ${data.archivedCount} faixa(s) já no archive (serão puladas)`, 'info');
+        }
+        addLog(`→ job iniciado: ${data.jobId}`, 'info');
+        setStatus('running', 'baixando...');
+        connectSSE(data.jobId);
+
+      } catch (e) {
+        addLog(`✗ Falha na conexão com o servidor: ${e.message}`, 'err-line');
+        setStatus('error');
+        reset();
+      }
+    }
+
+    function connectSSE(jobId) {
+      if (evtSource) evtSource.close();
+      evtSource = new EventSource(`/progress/${jobId}`);
+
+      evtSource.addEventListener('reconnected', (e) => {
+        const { logCount, done } = JSON.parse(e.data);
+        if (logCount > 0) {
+          addLog(`→ ${logCount} linha(s) do histórico${done ? ' · download já encerrado' : ''}`, 'info');
+        }
+      });
+
+      evtSource.addEventListener('log', (e) => {
+        const { line, stderr } = JSON.parse(e.data);
+        parseProgress(line);
+        addLog(line, classifyLine(line, stderr));
+        if (/\[ExtractAudio\]|Adding metadata to|EmbedThumbnail.*\.mp3/i.test(line)) {
+          scheduleLibraryRefresh();
+        }
+        const m = line.match(/downloads[/\\]([^/\\]+)[/\\]/i);
+        if (m) currentPlaylistDir = m[1];
+      });
+
+      evtSource.addEventListener('track', (e) => {
+        const { playlistDir } = JSON.parse(e.data);
+        if (playlistDir) currentPlaylistDir = playlistDir;
+        scheduleLibraryRefresh();
+      });
+
+      evtSource.addEventListener('done', (e) => {
+        const { message, playlistDir, partial, resumeLink } = JSON.parse(e.data);
+        if (playlistDir) currentPlaylistDir = playlistDir;
+        onJobFinished(message, playlistDir, partial, resumeLink || null);
+      });
+
+      evtSource.addEventListener('error', (e) => {
+        try {
+          const { message } = JSON.parse(e.data);
+          addLog(`✗ ${message}`, 'err-line');
+          setStatus('error', message);
+          saveLastDownload(inputLink.value.trim(), currentPlaylistDir);
+          loadLibrary();
+        } catch {
+          addLog('✗ Conexão SSE encerrada inesperadamente.', 'err-line');
+          setStatus('error');
+        }
+        reset();
+      });
+    }
+
+    async function cancelDownload() {
+      if (!currentJobId) return;
+      await fetch(`/cancel/${currentJobId}`, { method: 'POST' });
+      addLog('⚠ Cancelamento solicitado.', 'stderr');
+      setStatus('idle', 'cancelado');
+      reset();
+    }
+
+    function reset() {
+      btnDownload.disabled = false;
+      btnCancel.classList.remove('visible');
+      if (evtSource) { evtSource.close(); evtSource = null; }
+      currentJobId = null;
+      clearActiveJob();
+    }
+
+    btnDownload.addEventListener('click', startDownload);
+    btnCancel.addEventListener('click', cancelDownload);
+    btnPaste.addEventListener('click', pasteFromClipboard);
+    btnClear.addEventListener('click', () => { log.innerHTML = ''; });
+    btnRefreshLib.addEventListener('click', loadLibrary);
+    btnRenameSave.addEventListener('click', saveRename);
+    inputRename.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') saveRename();
+    });
+
+    inputLink.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') startDownload();
+    });
+
+    setStatus('idle');
+    loadLibrary();
+    tryReconnectActiveJob();
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => { });
+      });
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,7 @@
+node_modules
+downloads
+.git
+*.md
+.env
+.env.*
+cookies.txt
